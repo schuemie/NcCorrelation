@@ -1,0 +1,35 @@
+Package: NcCorrelation
+Type: Package
+Title: Estimating Correlation Between Negative Controls
+Version: 0.0.1
+Date: 2023-10-10
+Authors@R: c(
+  person("Martijn", "Schuemie", , "schuemie@ohdsi.org", role = c("aut", "cre"))
+  )
+Maintainer: Martijn Schuemie <schuemie@ohdsi.org>
+Description: An exploration into the correlation between negative control estimates.
+License: Apache License 2.0
+BugReports: https://github.com/ohdsi-studies/NcCorrelation/issues
+Depends:
+  DatabaseConnector,
+  R (>= 4.1.0)
+Imports:
+  FeatureExtraction,
+  Cyclops,
+  dplyr,
+  readr,
+  rlang,
+  ParallelLogger,
+  CohortGenerator,
+  CohortMethod,
+Suggests:
+  testthat,
+  DT,
+  shiny,
+  knitr
+Remotes:
+  ohdsi/FeatureExtraction,
+  ohdsi/CohortGenerator
+RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)
+Encoding: UTF-8

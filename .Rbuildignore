@@ -1,0 +1,13 @@
+^renv$
+^renv\.lock$
+^.*\.Rproj$
+^\.Rproj\.user$
+.gitattributes
+extras
+standalone
+.travis.yml
+^\.git
+deploy.sh
+compare_versions
+_pkgdown.yml
+docs
