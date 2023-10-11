@@ -100,9 +100,21 @@ runCohortMethod <- function(connectionDetails,
     fitOutcomeModelArgs = fitOutcomeModelArgs2
   )
   cmAnalysisList <- list(cmAnalysis1, cmAnalysis2)
-
+  
   # Run analyses ----------------------------------------------------------------------
-  multiThreadingSettings <- CohortMethod::createDefaultMultiThreadingSettings(maxCores = maxCores)
+  multiThreadingSettings <- CohortMethod::createMultiThreadingSettings(
+    getDbCohortMethodDataThreads = 1, 
+    createPsThreads = max(1, floor(maxCores/10)), 
+    psCvThreads = min(10, maxCores), 
+    createStudyPopThreads = min(3, maxCores), 
+    trimMatchStratifyThreads = min(5, maxCores), 
+    computeSharedBalanceThreads = min(3, maxCores), 
+    computeBalanceThreads = min(5, maxCores), 
+    prefilterCovariatesThreads = min(3, maxCores), 
+    fitOutcomeModelThreads = max(1, floor(maxCores/4)), 
+    outcomeCvThreads = min(4, maxCores), 
+    calibrationThreads = min(4, maxCores)
+  )
   cmResult <- CohortMethod::runCmAnalyses(
     connectionDetails = connectionDetails,
     cdmDatabaseSchema = cdmDatabaseSchema,
