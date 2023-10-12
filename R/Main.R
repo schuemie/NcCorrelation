@@ -43,7 +43,9 @@ execute <- function(connectionDetails,
                     maxCores = 1,
                     outputFolder,
                     databaseId,
-                    createCohorts = TRUE) {
+                    createCohorts = TRUE,
+                    runCohortMethod = TRUE,
+                    doBootstrap = TRUE) {
   if (!file.exists(outputFolder)) {
     dir.create(outputFolder, recursive = TRUE)
   }
@@ -61,14 +63,20 @@ execute <- function(connectionDetails,
       cohortTable = cohortTable
     )
   }
-  
-  # Run on full data -----------------------------------------------------------
-  runCohortMethod(
-    connectionDetails = connectionDetails,
-    cdmDatabaseSchema = cdmDatabaseSchema,
-    cohortDatabaseSchema = cohortDatabaseSchema,
-    cohortTable = cohortTable,
-    outputFolder = outputFolder,
-    maxCores = maxCores
-  )
+  if (runCohortMethod) {
+    runCohortMethod(
+      connectionDetails = connectionDetails,
+      cdmDatabaseSchema = cdmDatabaseSchema,
+      cohortDatabaseSchema = cohortDatabaseSchema,
+      cohortTable = cohortTable,
+      outputFolder = outputFolder,
+      maxCores = maxCores
+    )
+  }
+  if (doBootstrap) {
+    doBootstrapping(
+      maxCores = maxCores,
+      outputFolder = outputFolder
+    )
+  }
 }
