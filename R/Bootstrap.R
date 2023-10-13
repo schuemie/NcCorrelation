@@ -34,7 +34,7 @@ doBootstrapping <- function(maxCores,
   for (group in groups) {
     message(sprintf("Bootstrapping for target ID %d and comparator ID %d",
                     group$targetId[1],
-                    group$comparatorId[1],))
+                    group$comparatorId[1]))
     ParallelLogger::clusterApply(cluster = cluster, 
                                  x = seq_len(nBootstraps), 
                                  fun = doSingleBootstrap, 
@@ -42,6 +42,12 @@ doBootstrapping <- function(maxCores,
                                  outputFolder = outputFolder,
                                  bootstrapFolder = bootstrapFolder)
   }
+  # Combine bootstrap results
+  resultFiles <- list.files(bootstrapFolder, "^Estimates.*.rds$", full.names = TRUE)
+  results <- lapply(resultFiles, readRDS)
+  results <- results %>%
+    bind_rows()
+  saveRDS(results, file.path(outputFolder, "BootstrapEstimates.rds"))
 }
 
 # group = groups[[1]]
@@ -104,7 +110,7 @@ doSingleBootstrap <- function(iteration, group, outputFolder, bootstrapFolder) {
       estimates[[i]] <- bind_rows(unAdjustedModel$outcomeModelTreatmentEstimate,
                                   adjustedModel$outcomeModelTreatmentEstimate) %>%
         mutate(analysisId = c(1, 2),
-               outcomeId = group$outcomeId[1])
+               outcomeId = group$outcomeId[i])
     }
     estimates <- estimates %>%
       bind_rows() %>%
