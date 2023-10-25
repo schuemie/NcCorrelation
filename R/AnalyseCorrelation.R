@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# library(dplyr)
 
 computeCorrelation <- function(outputFolder, maxCores) {
   results <- readRDS(file.path(outputFolder, "BootstrapEstimates.rds"))
@@ -31,6 +32,7 @@ computeCorrelation <- function(outputFolder, maxCores) {
                                            bootstrapFolder = bootstrapFolder)
 }
 
+# group = groups[[2]]
 computeSingleCorrelationMatrix <- function(group) {
   outcomes <- group %>%
     group_by(.data$outcomeId) %>%
@@ -57,4 +59,12 @@ computeSingleCorrelationMatrix <- function(group) {
     theme(axis.text.x = element_text(angle = 45, vjust = 1, 
                                      size = 12, hjust = 1))+
     coord_fixed()
+  
+  which(correlations > 0.75, arr.ind = TRUE) 
+  correlations[19, 14]
+  
+  csvFileName <- system.file("NegativeControls.csv", package = "NcCorrelation") 
+  negativeControls <- readr::read_csv(csvFileName, show_col_types = FALSE) 
+  negativeControls[negativeControls$outcomeConceptId == outcomes[[19]]$outcomeId[1], ]
+  negativeControls[negativeControls$outcomeConceptId == outcomes[[14]]$outcomeId[1], ]
 }
