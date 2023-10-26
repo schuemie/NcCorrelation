@@ -20,7 +20,7 @@
 #'                                function \code{createConnectionDetails} in the
 #'                                \code{DatabaseConnector} package.
 #' @param cdmDatabaseSchema       A database schema containing health care data in the OMOP Commond
-#'                                Data Model. Note that for SQL Server, botth the database and schema
+#'                                Data Model. Note that for SQL Server, both the database and schema
 #'                                should be specified, e.g. 'cdm_schema.dbo'.
 #' @param cohortDatabaseSchema    The name of the database schema where the exposure and outcome cohorts will be
 #'                                created. 
@@ -31,9 +31,15 @@
 #' @param outputFolder            Name of local folder to place intermediary results; make sure to use
 #'                                forward slashes (/). Do not use a folder on a network drive since
 #'                                this greatly impacts performance.
-#' @param databaseId              A string used to identify the database in the results.
+#' @param databaseId              A string used to identify the database in the results. Will be used
+#'                                to generate file names, so avoid special characters.
 #' @param createCohorts           Should the cohorts be created? If `FALSE`, the cohorts are assumed to already
 #'                                exist.
+#' @param runCohortMethod         Run CohortMethod to produce effect-size estimates?                                
+#' @param doBootstrap             Perform the bootstrap? Requires CohortMethod to have completed.
+#' @param computeCorrelation      Compute correlation between negative control estimates? Requires
+#'                                the bootstrap to have completed.
+#' @param exportForSharing        Export results to CSV files for sharing?
 #'
 #' @export
 execute <- function(connectionDetails,
@@ -45,7 +51,9 @@ execute <- function(connectionDetails,
                     databaseId,
                     createCohorts = TRUE,
                     runCohortMethod = TRUE,
-                    doBootstrap = TRUE) {
+                    doBootstrap = TRUE,
+                    computeCorrelation = TRUE,
+                    exportForSharing = TRUE) {
   if (!file.exists(outputFolder)) {
     dir.create(outputFolder, recursive = TRUE)
   }
@@ -78,5 +86,13 @@ execute <- function(connectionDetails,
       maxCores = maxCores,
       outputFolder = outputFolder
     )
+  }
+  if (computeCorrelation) {
+    computeCorrelation(outputFolder = outputFolder, 
+                       maxCores = maxCores, 
+                       databaseId = databaseId) 
+  }
+  if (exportForSharing) {
+    exportForSharing(outputFolder = outputFolder)
   }
 }

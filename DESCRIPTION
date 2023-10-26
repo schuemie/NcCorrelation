@@ -22,12 +22,15 @@ Imports:
   ParallelLogger,
   CohortGenerator,
   CohortMethod,
+  ggplot2,
+  EmpiricalCalibration
 Suggests:
   testthat,
   DT,
   shiny,
   knitr
 Remotes:
+  ohdsi/CohortMethod,
   ohdsi/FeatureExtraction,
   ohdsi/CohortGenerator
 RoxygenNote: 7.2.3

@@ -15,7 +15,6 @@
 # limitations under the License.
 # library(dplyr)
 
-#' @export
 createCohorts <- function(connectionDetails,
                           cdmDatabaseSchema,
                           cohortDatabaseSchema,

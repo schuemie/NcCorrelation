@@ -4,9 +4,9 @@
 \name{NcCorrelation-package}
 \alias{NcCorrelation}
 \alias{NcCorrelation-package}
-\title{NcCorrelation: Estimating correlation between negative controls}
+\title{NcCorrelation: Estimating Correlation Between Negative Controls}
 \description{
-Evaluation of the performance of comparative effect estimation methods when sample size (number of subjects in the target and comparator) is small.
+An exploration into the correlation between negative control estimates.
 }
 \seealso{
 Useful links:

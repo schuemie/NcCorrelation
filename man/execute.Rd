@@ -12,7 +12,11 @@ execute(
   maxCores = 1,
   outputFolder,
   databaseId,
-  createCohorts = TRUE
+  createCohorts = TRUE,
+  runCohortMethod = TRUE,
+  doBootstrap = TRUE,
+  computeCorrelation = TRUE,
+  exportForSharing = TRUE
 )
 }
 \arguments{
@@ -21,7 +25,7 @@ function \code{createConnectionDetails} in the
 \code{DatabaseConnector} package.}
 
 \item{cdmDatabaseSchema}{A database schema containing health care data in the OMOP Commond
-Data Model. Note that for SQL Server, botth the database and schema
+Data Model. Note that for SQL Server, both the database and schema
 should be specified, e.g. 'cdm_schema.dbo'.}
 
 \item{cohortDatabaseSchema}{The name of the database schema where the exposure and outcome cohorts will be
@@ -37,10 +41,20 @@ this can speed up the analyses.}
 forward slashes (/). Do not use a folder on a network drive since
 this greatly impacts performance.}
 
-\item{databaseId}{A string used to identify the database in the results.}
+\item{databaseId}{A string used to identify the database in the results. Will be used
+to generate file names, so avoid special characters.}
 
 \item{createCohorts}{Should the cohorts be created? If \code{FALSE}, the cohorts are assumed to already
 exist.}
+
+\item{runCohortMethod}{Run CohortMethod to produce effect-size estimates?}
+
+\item{doBootstrap}{Perform the bootstrap? Requires CohortMethod to have completed.}
+
+\item{computeCorrelation}{Compute correlation between negative control estimates? Requires
+the bootstrap to have completed.}
+
+\item{exportForSharing}{Export results to CSV files for sharing?}
 }
 \description{
 Run the main analysis
