@@ -72,6 +72,7 @@ execute <- function(connectionDetails,
     )
   }
   if (runCohortMethod) {
+    message("Running cohort method")
     runCohortMethod(
       connectionDetails = connectionDetails,
       cdmDatabaseSchema = cdmDatabaseSchema,
@@ -82,17 +83,20 @@ execute <- function(connectionDetails,
     )
   }
   if (doBootstrap) {
+    message("Performing bootstrap")
     doBootstrapping(
       maxCores = maxCores,
       outputFolder = outputFolder
     )
   }
   if (computeCorrelation) {
+    message("Computing correlations")
     computeCorrelation(outputFolder = outputFolder, 
-                       maxCores = maxCores, 
-                       databaseId = databaseId) 
+                       maxCores = maxCores) 
   }
   if (exportForSharing) {
-    exportForSharing(outputFolder = outputFolder)
+    message("Exporting results")
+    exportForSharing(outputFolder = outputFolder,
+                     databaseId = databaseId)
   }
 }

@@ -16,7 +16,7 @@
 
 # library(dplyr)
 
-computeCorrelation <- function(outputFolder, maxCores, databaseId) {
+computeCorrelation <- function(outputFolder, maxCores) {
   results <- readRDS(file.path(outputFolder, "BootstrapEstimates.rds"))
   groups <- results %>% 
     group_by(.data$targetId, .data$comparatorId, .data$analysisId) %>%
@@ -28,18 +28,16 @@ computeCorrelation <- function(outputFolder, maxCores, databaseId) {
   ParallelLogger::clusterApply(cluster = cluster, 
                                x = groups, 
                                fun = computeSingleCorrelationMatrix, 
-                               outputFolder = outputFolder,
-                               databaseId = databaseId)
+                               outputFolder = outputFolder)
 }
 
-# group = groups[[1]]
-computeSingleCorrelationMatrix <- function(group, outputFolder, databaseId) {
+# group = groups[[3]]
+computeSingleCorrelationMatrix <- function(group, outputFolder) {
   fileName <- file.path(outputFolder, 
                         sprintf("Correlations_t%d_c%d_a%d.rds",
                                 group$targetId[1],
                                 group$comparatorId[1],
-                                group$analysisId[1],
-                                databaseId))
+                                group$analysisId[1]))
   if (!file.exists(fileName)) {
     outcomes <- group %>%
       group_by(.data$outcomeId) %>%
@@ -51,10 +49,14 @@ computeSingleCorrelationMatrix <- function(group, outputFolder, databaseId) {
       for (j in seq(i+1, length(outcomes))) {
         logRr1 <- outcomes[[i]]$logRr
         logRr2 <- outcomes[[j]]$logRr
-        idx <- !is.na(logRr1) & !is.na(logRr2)
+        seLogRr1 <- outcomes[[i]]$seLogRr
+        seLogRr2 <- outcomes[[j]]$seLogRr
+        idx <- !is.na(logRr1) & !is.na(logRr2) & !is.na(seLogRr1) & !is.na(seLogRr2)
         r <- cor(logRr1[idx], logRr2[idx])
         correlations[i, j] <- r
         correlations[j, i] <- r
+        if (isTRUE(r == 1))
+          stop("asdf")
       }
     }
     colnames(correlations) <- names

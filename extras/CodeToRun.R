@@ -72,13 +72,17 @@ execute(connectionDetails,
         maxCores = maxCores,
         outputFolder = outputFolder,
         databaseId = databaseId,
-        createCohorts = TRUE,
-        runCohortMethod = TRUE,
-        doBootstrap = TRUE,
-        computeCorrelation = TRUE) 
+        createCohorts = F,
+        runCohortMethod = F,
+        doBootstrap = F,
+        computeCorrelation = TRUE,
+        exportForSharing = TRUE) 
 
 # Generate plots and tables ----------------------------------------------------
 # Should work even when csv files from multiple DBs are put in one export folder:
 exportFolder <- file.path(outputFolder, "export")
 plotFolder <- file.path(outputFolder, "plotsAndTables")
-plotCorrelations()
+plotCorrelations(exportFolder = exportFolder,
+                 plotFolder = plotFolder)
+writeExtremeCorrelations(exportFolder = exportFolder,
+                         plotFolder = plotFolder)
