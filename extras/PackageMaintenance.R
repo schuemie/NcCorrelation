@@ -30,7 +30,9 @@ OhdsiRTools::createRenvLockFile(
   mode = "description",
   includeRootPackage = FALSE,
   additionalRequiredPackages = c("keyring",
-                                 "aws.s3")
+                                 "aws.s3",
+                                 "R.utils",
+                                 "parallel")
 )
 
 

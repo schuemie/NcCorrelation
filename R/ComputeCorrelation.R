@@ -18,26 +18,32 @@
 
 computeCorrelation <- function(outputFolder, maxCores) {
   results <- readRDS(file.path(outputFolder, "BootstrapEstimates.rds"))
-  groups <- results %>% 
+  groups <- results %>%
     group_by(.data$targetId, .data$comparatorId, .data$analysisId) %>%
     group_split()
-  
+
   cluster <- ParallelLogger::makeCluster(min(maxCores, length(groups)))
   ParallelLogger::clusterRequire(cluster, "dplyr")
   on.exit(ParallelLogger::stopCluster(cluster))
-  ParallelLogger::clusterApply(cluster = cluster, 
-                               x = groups, 
-                               fun = computeSingleCorrelationMatrix, 
-                               outputFolder = outputFolder)
+  ParallelLogger::clusterApply(
+    cluster = cluster,
+    x = groups,
+    fun = computeSingleCorrelationMatrix,
+    outputFolder = outputFolder
+  )
 }
 
 # group = groups[[3]]
 computeSingleCorrelationMatrix <- function(group, outputFolder) {
-  fileName <- file.path(outputFolder, 
-                        sprintf("Correlations_t%d_c%d_a%d.rds",
-                                group$targetId[1],
-                                group$comparatorId[1],
-                                group$analysisId[1]))
+  fileName <- file.path(
+    outputFolder,
+    sprintf(
+      "Correlations_t%d_c%d_a%d.rds",
+      group$targetId[1],
+      group$comparatorId[1],
+      group$analysisId[1]
+    )
+  )
   if (!file.exists(fileName)) {
     outcomes <- group %>%
       group_by(.data$outcomeId) %>%
@@ -46,7 +52,7 @@ computeSingleCorrelationMatrix <- function(group, outputFolder) {
     names <- vector("integer", length(outcomes))
     for (i in seq(1, length(outcomes) - 1)) {
       names[i] <- outcomes[[i]]$outcomeId[1]
-      for (j in seq(i+1, length(outcomes))) {
+      for (j in seq(i + 1, length(outcomes))) {
         logRr1 <- outcomes[[i]]$logRr
         logRr2 <- outcomes[[j]]$logRr
         seLogRr1 <- outcomes[[i]]$seLogRr
@@ -55,8 +61,9 @@ computeSingleCorrelationMatrix <- function(group, outputFolder) {
         r <- cor(logRr1[idx], logRr2[idx])
         correlations[i, j] <- r
         correlations[j, i] <- r
-        if (isTRUE(r == 1))
+        if (isTRUE(r == 1)) {
           stop("asdf")
+        }
       }
     }
     colnames(correlations) <- names

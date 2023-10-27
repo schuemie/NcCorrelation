@@ -18,28 +18,33 @@ doBootstrapping <- function(maxCores,
                             outputFolder,
                             nBootstraps = 100) {
   bootstrapFolder <- file.path(outputFolder, "bootstrap")
-  if (!dir.exists(bootstrapFolder))
+  if (!dir.exists(bootstrapFolder)) {
     dir.create(bootstrapFolder)
+  }
   fileReference <- CohortMethod::getFileReference(outputFolder)
   groups <- fileReference %>%
     filter(.data$analysisId == 2) %>%
     select("targetId", "comparatorId", "outcomeId", "sharedPsFile", "studyPopFile") %>%
     group_by(.data$targetId, .data$comparatorId) %>%
     group_split()
-  
+
   cluster <- ParallelLogger::makeCluster(min(maxCores, 10))
   ParallelLogger::clusterRequire(cluster, "dplyr")
   on.exit(ParallelLogger::stopCluster(cluster))
   for (group in groups) {
-    message(sprintf("Bootstrapping for target ID %d and comparator ID %d",
-                    group$targetId[1],
-                    group$comparatorId[1]))
-    ParallelLogger::clusterApply(cluster = cluster, 
-                                 x = seq_len(nBootstraps), 
-                                 fun = doSingleBootstrap, 
-                                 group = group,
-                                 outputFolder = outputFolder,
-                                 bootstrapFolder = bootstrapFolder)
+    message(sprintf(
+      "Bootstrapping for target ID %d and comparator ID %d",
+      group$targetId[1],
+      group$comparatorId[1]
+    ))
+    ParallelLogger::clusterApply(
+      cluster = cluster,
+      x = seq_len(nBootstraps),
+      fun = doSingleBootstrap,
+      group = group,
+      outputFolder = outputFolder,
+      bootstrapFolder = bootstrapFolder
+    )
   }
   # Combine bootstrap results
   resultFiles <- list.files(bootstrapFolder, "^Estimates.*.rds$", full.names = TRUE)
@@ -51,21 +56,23 @@ doBootstrapping <- function(maxCores,
 
 # group = groups[[1]]
 doSingleBootstrap <- function(iteration, group, outputFolder, bootstrapFolder) {
-  fileName <- file.path(bootstrapFolder, sprintf("Estimates_t%d_c%d_i%d.rds",
-                                              group$targetId[1],
-                                              group$comparatorId[1],
-                                              iteration))
+  fileName <- file.path(bootstrapFolder, sprintf(
+    "Estimates_t%d_c%d_i%d.rds",
+    group$targetId[1],
+    group$comparatorId[1],
+    iteration
+  ))
   if (!file.exists(fileName)) {
     set.seed(iteration)
     population <- readRDS(file.path(outputFolder, group$sharedPsFile[1]))
-    
+
     # Stratify by PS
     population <- CohortMethod::stratifyByPs(population, numberOfStrata = 10)
-    
+
     # Sample with replacement
     n <- nrow(population)
     population <- population[sample.int(n, n, replace = TRUE), ]
-    
+
     # Create study populations and fit outcome models
     estimates <- vector("list", length = nrow(group))
     for (i in seq_len(nrow(group))) {
@@ -87,11 +94,13 @@ doSingleBootstrap <- function(iteration, group, outputFolder, bootstrapFolder) {
         profileBounds = NULL
       )
       if (is.null(adjustedModel$outcomeModelTreatmentEstimate)) {
-        adjustedModel$outcomeModelTreatmentEstimate <- tibble(logRr = NA,
-                                                              logLb95 = NA,
-                                                              logUb95 = NA,
-                                                              seLogRr = NA,
-                                                              llr = NA)
+        adjustedModel$outcomeModelTreatmentEstimate <- tibble(
+          logRr = NA,
+          logLb95 = NA,
+          logUb95 = NA,
+          seLogRr = NA,
+          llr = NA
+        )
       }
       unAdjustedModel <- CohortMethod::fitOutcomeModel(
         population = studyPop,
@@ -100,22 +109,30 @@ doSingleBootstrap <- function(iteration, group, outputFolder, bootstrapFolder) {
         profileBounds = NULL
       )
       if (is.null(unAdjustedModel$outcomeModelTreatmentEstimate)) {
-        unAdjustedModel$outcomeModelTreatmentEstimate <- tibble(logRr = NA,
-                                                                logLb95 = NA,
-                                                                logUb95 = NA,
-                                                                seLogRr = NA,
-                                                                llr = NA)
+        unAdjustedModel$outcomeModelTreatmentEstimate <- tibble(
+          logRr = NA,
+          logLb95 = NA,
+          logUb95 = NA,
+          seLogRr = NA,
+          llr = NA
+        )
       }
-      estimates[[i]] <- bind_rows(unAdjustedModel$outcomeModelTreatmentEstimate,
-                                  adjustedModel$outcomeModelTreatmentEstimate) %>%
-        mutate(analysisId = c(1, 2),
-               outcomeId = group$outcomeId[i])
+      estimates[[i]] <- bind_rows(
+        unAdjustedModel$outcomeModelTreatmentEstimate,
+        adjustedModel$outcomeModelTreatmentEstimate
+      ) %>%
+        mutate(
+          analysisId = c(1, 2),
+          outcomeId = group$outcomeId[i]
+        )
     }
     estimates <- estimates %>%
       bind_rows() %>%
-      mutate(targetId = group$targetId[1],
-             comparatorId = group$comparatorId[1],
-             iteration = !!iteration)
+      mutate(
+        targetId = group$targetId[1],
+        comparatorId = group$comparatorId[1],
+        iteration = !!iteration
+      )
     saveRDS(estimates, fileName)
   }
 }

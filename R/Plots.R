@@ -23,9 +23,9 @@
 #'
 #' @return
 #' Does not return anything. Is called for the side-effect of having plot files written.
-#' 
+#'
 #' @export
-plotCorrelations <- function(exportFolder, plotFolder) { 
+plotCorrelations <- function(exportFolder, plotFolder) {
   if (!dir.exists(plotFolder)) {
     dir.create(plotFolder)
   }
@@ -34,7 +34,7 @@ plotCorrelations <- function(exportFolder, plotFolder) {
   for (file in files) {
     correlations <- as.matrix(read.csv(file.path(exportFolder, file), row.names = 1, header = TRUE))
     colnames(correlations) <- gsub("^X", "", colnames(correlations))
-    
+
     colnames(correlations) <- seq_len(ncol(correlations))
     rownames(correlations) <- seq_len(nrow(correlations))
     vizData <- as_tibble(expand.grid(x = seq_len(ncol(correlations)), y = seq_len(ncol(correlations)))) %>%
@@ -42,16 +42,20 @@ plotCorrelations <- function(exportFolder, plotFolder) {
       filter(!is.na(.data$rho))
     plot <- ggplot2::ggplot(data = vizData, ggplot2::aes(x = .data$x, y = .data$y, fill = .data$rho)) +
       ggplot2::geom_tile() +
-      ggplot2::scale_fill_gradient2(low = "blue", 
-                                    high = "red", 
-                                    mid = "white", 
-                                    midpoint = 0, 
-                                    limit = c(-1,1), 
-                                    name = "Pearson\nCorrelation") +
-      ggplot2::theme(axis.title = ggplot2::element_blank(),
-                     axis.text = ggplot2::element_blank(),
-                     axis.ticks = ggplot2::element_blank(),
-                     panel.background = ggplot2::element_blank()) +
+      ggplot2::scale_fill_gradient2(
+        low = "blue",
+        high = "red",
+        mid = "white",
+        midpoint = 0,
+        limit = c(-1, 1),
+        name = "Pearson\nCorrelation"
+      ) +
+      ggplot2::theme(
+        axis.title = ggplot2::element_blank(),
+        axis.text = ggplot2::element_blank(),
+        axis.ticks = ggplot2::element_blank(),
+        panel.background = ggplot2::element_blank()
+      ) +
       ggplot2::coord_fixed()
     fileName <- file.path(plotFolder, gsub(".csv", ".png", file))
     ggplot2::ggsave(filename = fileName, plot = plot, width = 8, height = 7, dpi = 200)
@@ -65,9 +69,9 @@ plotCorrelations <- function(exportFolder, plotFolder) {
 #'
 #' @return
 #' Does not return anything. Is called for the side-effect of having a CSV file written.
-#' 
+#'
 #' @export
-writeExtremeCorrelations <- function(exportFolder, plotFolder) { 
+writeExtremeCorrelations <- function(exportFolder, plotFolder) {
   if (!dir.exists(plotFolder)) {
     dir.create(plotFolder)
   }
@@ -82,8 +86,8 @@ writeExtremeCorrelations <- function(exportFolder, plotFolder) {
   for (file in files) {
     correlations <- as.matrix(read.csv(file.path(exportFolder, file), row.names = 1, header = TRUE))
     colnames(correlations) <- gsub("^X", "", colnames(correlations))
-    
-    idx <- which(abs(correlations) > 0.5, arr.ind = TRUE) 
+
+    idx <- which(abs(correlations) > 0.5, arr.ind = TRUE)
     idx <- idx[idx[, 1] < idx[, 2], ]
     results <- list()
     for (i in seq_len(nrow(idx))) {
@@ -97,14 +101,22 @@ writeExtremeCorrelations <- function(exportFolder, plotFolder) {
     }
     results <- results %>%
       bind_rows() %>%
-      inner_join(outcomes %>%
-                   rename(outcomeId1 = "outcomeId",
-                          outcomeName1 = "outcomeName"),
-                 by = join_by("outcomeId1")) %>%
-      inner_join(outcomes %>%
-                   rename(outcomeId2 = "outcomeId",
-                          outcomeName2 = "outcomeName"),
-                 by = join_by("outcomeId2")) %>%
+      inner_join(
+        outcomes %>%
+          rename(
+            outcomeId1 = "outcomeId",
+            outcomeName1 = "outcomeName"
+          ),
+        by = join_by("outcomeId1")
+      ) %>%
+      inner_join(
+        outcomes %>%
+          rename(
+            outcomeId2 = "outcomeId",
+            outcomeName2 = "outcomeName"
+          ),
+        by = join_by("outcomeId2")
+      ) %>%
       mutate(
         targetId = as.numeric(gsub("^.*_t", "", gsub("_c.*.csv", "", file))),
         comparatorId = as.numeric(gsub("^.*_c", "", gsub("_a.*.csv", "", file))),

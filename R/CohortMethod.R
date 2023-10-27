@@ -34,7 +34,7 @@ runCohortMethod <- function(connectionDetails,
       as.numeric(strsplit(as.character(controls$comparatorConceptIds[1]), ";")[[1]])
     )
     outcomes <- list()
-    for (j in seq_along(controls$outcomeConceptId )) {
+    for (j in seq_along(controls$outcomeConceptId)) {
       outcomes[[j]] <- CohortMethod::createOutcome(
         outcomeId = controls$outcomeConceptId[j],
         outcomeOfInterest = TRUE
@@ -102,19 +102,19 @@ runCohortMethod <- function(connectionDetails,
   
   # Run analyses ----------------------------------------------------------------------
   multiThreadingSettings <- CohortMethod::createMultiThreadingSettings(
-    getDbCohortMethodDataThreads = 1, 
-    createPsThreads = max(1, floor(maxCores/10)), 
-    psCvThreads = min(10, maxCores), 
-    createStudyPopThreads = min(3, maxCores), 
-    trimMatchStratifyThreads = min(5, maxCores), 
-    computeSharedBalanceThreads = min(3, maxCores), 
-    computeBalanceThreads = min(5, maxCores), 
-    prefilterCovariatesThreads = min(3, maxCores), 
-    fitOutcomeModelThreads = max(1, floor(maxCores/4)), 
-    outcomeCvThreads = min(4, maxCores), 
+    getDbCohortMethodDataThreads = 1,
+    createPsThreads = max(1, floor(maxCores / 10)),
+    psCvThreads = min(10, maxCores),
+    createStudyPopThreads = min(3, maxCores),
+    trimMatchStratifyThreads = min(5, maxCores),
+    computeSharedBalanceThreads = min(3, maxCores),
+    computeBalanceThreads = min(5, maxCores),
+    prefilterCovariatesThreads = min(3, maxCores),
+    fitOutcomeModelThreads = max(1, floor(maxCores / 4)),
+    outcomeCvThreads = min(4, maxCores),
     calibrationThreads = min(4, maxCores)
   )
-  cmResult <- CohortMethod::runCmAnalyses(
+  CohortMethod::runCmAnalyses(
     connectionDetails = connectionDetails,
     cdmDatabaseSchema = cdmDatabaseSchema,
     exposureDatabaseSchema = cohortDatabaseSchema,

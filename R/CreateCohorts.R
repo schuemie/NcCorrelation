@@ -21,10 +21,10 @@ createCohorts <- function(connectionDetails,
                           cohortTable) {
   connection <- connect(connectionDetails)
   on.exit(disconnect(connection))
-  
+
   cohortTableNames <- CohortGenerator::getCohortTableNames(cohortTable)
   CohortGenerator::createCohortTables(
-    connection = connection, 
+    connection = connection,
     cohortDatabaseSchema = cohortDatabaseSchema,
     cohortTableNames = cohortTableNames
   )
@@ -32,7 +32,7 @@ createCohorts <- function(connectionDetails,
   rdsFileName <- system.file("CohortDefinitionSet.rds", package = "NcCorrelation")
   cohortDefinitionSet <- readRDS(rdsFileName)
   CohortGenerator::generateCohortSet(
-    connection = connection, 
+    connection = connection,
     cohortDatabaseSchema = cohortDatabaseSchema,
     cohortTableNames = cohortTableNames,
     cdmDatabaseSchema = cdmDatabaseSchema,
@@ -44,7 +44,7 @@ createCohorts <- function(connectionDetails,
     mutate(cohortId = .data$outcomeConceptId) %>%
     select("cohortId", cohortName = "outcomeName", "outcomeConceptId")
   CohortGenerator::generateNegativeControlOutcomeCohorts(
-    connection = connection, 
+    connection = connection,
     cohortDatabaseSchema = cohortDatabaseSchema,
     cohortTable = cohortTable,
     cdmDatabaseSchema = cdmDatabaseSchema,

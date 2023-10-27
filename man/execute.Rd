@@ -24,7 +24,7 @@ execute(
 function \code{createConnectionDetails} in the
 \code{DatabaseConnector} package.}
 
-\item{cdmDatabaseSchema}{A database schema containing health care data in the OMOP Commond
+\item{cdmDatabaseSchema}{A database schema containing health care data in the OMOP Common
 Data Model. Note that for SQL Server, both the database and schema
 should be specified, e.g. 'cdm_schema.dbo'.}
 

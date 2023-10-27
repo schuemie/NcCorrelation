@@ -19,13 +19,13 @@
 #' @param connectionDetails       An R object of type \code{ConnectionDetails} created using the
 #'                                function \code{createConnectionDetails} in the
 #'                                \code{DatabaseConnector} package.
-#' @param cdmDatabaseSchema       A database schema containing health care data in the OMOP Commond
+#' @param cdmDatabaseSchema       A database schema containing health care data in the OMOP Common
 #'                                Data Model. Note that for SQL Server, both the database and schema
 #'                                should be specified, e.g. 'cdm_schema.dbo'.
 #' @param cohortDatabaseSchema    The name of the database schema where the exposure and outcome cohorts will be
-#'                                created. 
+#'                                created.
 #' @param cohortTable             The name of the table that will be created to store the exposure
-#'                                and outcome cohorts. 
+#'                                and outcome cohorts.
 #' @param maxCores                How many parallel cores should be used? If more cores are made available
 #'                                this can speed up the analyses.
 #' @param outputFolder            Name of local folder to place intermediary results; make sure to use
@@ -35,7 +35,7 @@
 #'                                to generate file names, so avoid special characters.
 #' @param createCohorts           Should the cohorts be created? If `FALSE`, the cohorts are assumed to already
 #'                                exist.
-#' @param runCohortMethod         Run CohortMethod to produce effect-size estimates?                                
+#' @param runCohortMethod         Run CohortMethod to produce effect-size estimates?
 #' @param doBootstrap             Perform the bootstrap? Requires CohortMethod to have completed.
 #' @param computeCorrelation      Compute correlation between negative control estimates? Requires
 #'                                the bootstrap to have completed.
@@ -57,7 +57,7 @@ execute <- function(connectionDetails,
   if (!file.exists(outputFolder)) {
     dir.create(outputFolder, recursive = TRUE)
   }
-  
+
   ParallelLogger::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
   ParallelLogger::addDefaultErrorReportLogger(file.path(outputFolder, "errorReportR.txt"))
   on.exit(ParallelLogger::unregisterLogger("DEFAULT_FILE_LOGGER", silent = TRUE))
@@ -91,12 +91,16 @@ execute <- function(connectionDetails,
   }
   if (computeCorrelation) {
     message("Computing correlations")
-    computeCorrelation(outputFolder = outputFolder, 
-                       maxCores = maxCores) 
+    computeCorrelation(
+      outputFolder = outputFolder,
+      maxCores = maxCores
+    )
   }
   if (exportForSharing) {
     message("Exporting results")
-    exportForSharing(outputFolder = outputFolder,
-                     databaseId = databaseId)
+    exportForSharing(
+      outputFolder = outputFolder,
+      databaseId = databaseId
+    )
   }
 }
