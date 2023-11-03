@@ -33,6 +33,7 @@
 #'                                this greatly impacts performance.
 #' @param databaseId              A string used to identify the database in the results. Will be used
 #'                                to generate file names, so avoid special characters.
+#' @param minCellCount            Minimum cell count to report. Counts below this will be masked to protect privacy.
 #' @param createCohorts           Should the cohorts be created? If `FALSE`, the cohorts are assumed to already
 #'                                exist.
 #' @param runCohortMethod         Run CohortMethod to produce effect-size estimates?
@@ -47,6 +48,7 @@ execute <- function(connectionDetails,
                     cohortDatabaseSchema,
                     cohortTable,
                     maxCores = 1,
+                    minCellCount = 5,
                     outputFolder,
                     databaseId,
                     createCohorts = TRUE,
@@ -100,7 +102,8 @@ execute <- function(connectionDetails,
     message("Exporting results")
     exportForSharing(
       outputFolder = outputFolder,
-      databaseId = databaseId
+      databaseId = databaseId,
+      minCellCount = minCellCount
     )
   }
 }

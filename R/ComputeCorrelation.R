@@ -21,7 +21,7 @@ computeCorrelation <- function(outputFolder, maxCores) {
   groups <- results %>%
     group_by(.data$targetId, .data$comparatorId, .data$analysisId) %>%
     group_split()
-
+  
   cluster <- ParallelLogger::makeCluster(min(maxCores, length(groups)))
   ParallelLogger::clusterRequire(cluster, "dplyr")
   on.exit(ParallelLogger::stopCluster(cluster))
@@ -58,11 +58,13 @@ computeSingleCorrelationMatrix <- function(group, outputFolder) {
         seLogRr1 <- outcomes[[i]]$seLogRr
         seLogRr2 <- outcomes[[j]]$seLogRr
         idx <- !is.na(logRr1) & !is.na(logRr2) & !is.na(seLogRr1) & !is.na(seLogRr2)
-        r <- cor(logRr1[idx], logRr2[idx])
-        correlations[i, j] <- r
-        correlations[j, i] <- r
-        if (isTRUE(r == 1)) {
-          stop("asdf")
+        if (mean(idx) > 0.5) {
+          r <- cor(logRr1[idx], logRr2[idx])
+          correlations[i, j] <- r
+          correlations[j, i] <- r
+          # if (isTRUE(r < -0.5)) {
+          #   stop("asdf")
+          # }
         }
       }
     }

@@ -88,7 +88,7 @@ writeExtremeCorrelations <- function(exportFolder, plotFolder) {
     colnames(correlations) <- gsub("^X", "", colnames(correlations))
 
     idx <- which(abs(correlations) > 0.5, arr.ind = TRUE)
-    idx <- idx[idx[, 1] < idx[, 2], ]
+    idx <- idx[idx[, 1] < idx[, 2], , drop = FALSE]
     results <- list()
     for (i in seq_len(nrow(idx))) {
       rowIdx <- idx[i, 1]

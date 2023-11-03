@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-exportForSharing <- function(outputFolder, databaseId) {
+exportForSharing <- function(outputFolder, databaseId, minCellCount) {
   exportFolder <- file.path(outputFolder, "export")
   if (!dir.exists(exportFolder)) {
     dir.create(exportFolder)
@@ -51,10 +51,23 @@ exportForSharing <- function(outputFolder, databaseId) {
       "targetId",
       "comparatorId",
       "outcomeId",
+      "targetSubjects",
+      "comparatorSubjects",
+      "targetOutcomes", 
+      "comparatorOutcomes",
       "ci95Lb",
       "ci95Ub",
       "logRr",
       "seLogRr"
+    ) %>%
+    mutate(
+      targetSubjects = if_else(.data$targetSubjects < minCellCount, -minCellCount, .data$targetSubjects),
+      comparatorSubjects = if_else(.data$comparatorSubjects < minCellCount, -minCellCount, .data$comparatorSubjects),
+      targetOutcomes = if_else(.data$targetOutcomes < minCellCount, -minCellCount, .data$targetOutcomes),
+      comparatorOutcomes = if_else(.data$comparatorOutcomes < minCellCount, -minCellCount, .data$comparatorOutcomes)
+      ) %>%
+    mutate(
+      logRr = if_else(is.na(.data$seLogRr), NA, .data$logRr)
     )
   readr::write_csv(estimates, file.path(
     exportFolder,
@@ -85,7 +98,7 @@ exportForSharing <- function(outputFolder, databaseId) {
 
 # group = groups[[1]]
 computeSystematicErrorDistribution <- function(group) {
-  null <- EmpiricalCalibration::fitMcmcNull(group$logRr, group$seLogRr)
+  null <- suppressWarnings(EmpiricalCalibration::fitMcmcNull(group$logRr, group$seLogRr))
   ease <- EmpiricalCalibration::computeExpectedAbsoluteSystematicError(null)
   result <- group %>%
     head(1) %>%
