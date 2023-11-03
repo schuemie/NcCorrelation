@@ -87,3 +87,6 @@ plotCorrelations(exportFolder = exportFolder,
                  plotFolder = plotFolder)
 writeExtremeCorrelations(exportFolder = exportFolder,
                          plotFolder = plotFolder)
+
+# Collect all ZIP files in one place for sharing -------------------------------
+
