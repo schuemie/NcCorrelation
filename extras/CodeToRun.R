@@ -89,4 +89,5 @@ writeExtremeCorrelations(exportFolder = exportFolder,
                          plotFolder = plotFolder)
 
 # Collect all ZIP files in one place for sharing -------------------------------
-
+files <- list.files(studyFolder, "Results_.*.zip", recursive = TRUE, full.names = TRUE)
+file.copy(files, studyFolder)
